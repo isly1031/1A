@@ -1,0 +1,53 @@
+# 安裝 Tesseract OCR 和 pytesseract
+!apt install tesseract-ocr
+!pip install pytesseract
+!pip install matplotlib
+
+# 安裝 snownlp 模組
+!pip install snownlp
+
+# 引入必要的庫
+from googletrans import Translator
+import pytesseract
+from google.colab import files
+import cv2
+import matplotlib.pyplot as plt
+from snownlp import SnowNLP
+
+# 上傳圖片
+uploaded = files.upload()
+
+# 取得上傳的圖片檔案名稱
+image_filename = list(uploaded.keys())[0]
+
+# 讀取上傳的圖片
+image = cv2.imread(image_filename)
+
+# 將圖片轉為灰階
+gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+# 使用 pytesseract 進行 OCR 掃描
+text = pytesseract.image_to_string(gray_image)
+
+# 顯示掃描結果
+print("英文原文:")
+print(text)
+
+# 使用 Google Translate API 進行翻譯
+translator = Translator()
+translation = translator.translate(text, src='en', dest='zh-TW')
+
+# 顯示翻譯結果
+print("\n翻譯結果:")
+print(translation.text)
+
+# 使用 snownlp 进行情绪分析
+s = SnowNLP(translation.text)
+sentiment = s.sentiments
+
+# 顯示情緒分析結果
+print("\n情緒分析結果:")
+if sentiment > 0.5:
+    print("正面情緒")
+else:
+    print("負面情緒")
